@@ -98,8 +98,8 @@ final case class ProcessStream(
   def string(charset: Charset): ZIO[Any, CommandError, String] =
     ZIO.scoped {close *> ProcessPlatformSpecific.wait(inputStream) *> ZIO.attemptBlockingCancelable {
       new String(inputStream.readAllBytes(), charset)
-    }(ZIO.succeed(inputStream.close())).refineOrDie { case CommandThrowable.IOError(e) =>
+    }(ZIO.succeed(inputStream.close()))}.refineOrDie { case CommandThrowable.IOError(e) =>
       e
-    }}
+    }
     
 }
