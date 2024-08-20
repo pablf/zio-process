@@ -28,7 +28,7 @@ final case class ProcessStream(
   private[process] val outputStream: Option[OutputStream] = None
 ) {
 
-  private def close: ZIO[Any, Nothing, Unit] =
+  private def close: ZIO[Any, CommandError, Unit] =
     outputStream match {
       case None      => ZIO.unit
       case Some(out) => ZIO.attemptBlockingCancelable(out.close()).mapError {
