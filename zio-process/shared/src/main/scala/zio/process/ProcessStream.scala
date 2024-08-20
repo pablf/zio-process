@@ -94,12 +94,10 @@ final case class ProcessStream(
    * Note: Needs Java 9 or greater.
    */
   def string(charset: Charset): ZIO[Any, CommandError, String] =
-    ZIO.scoped {
-      close *> ZIO.attemptBlockingCancelable {
+    close *> ZIO.attemptBlockingCancelable {
       new String(inputStream.readAllBytes(), charset)
     }(ZIO.succeed(inputStream.close())).refineOrDie { case CommandThrowable.IOError(e) =>
       e
-    }
     }
     
 }
