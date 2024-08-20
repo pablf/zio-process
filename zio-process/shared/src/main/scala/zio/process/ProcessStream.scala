@@ -31,7 +31,7 @@ final case class ProcessStream(
   private def close: ZIO[Any, Nothing, Unit] =
     outputStream match {
       case None      => ZIO.unit
-      case Some(out) => ZIO.succeed(out.close())
+      case Some(out) => ZIO.attemptBlockingCancelable(out.close())
     }
 
   /**
