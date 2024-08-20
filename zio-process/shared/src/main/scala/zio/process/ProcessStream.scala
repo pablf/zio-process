@@ -32,7 +32,7 @@ final case class ProcessStream(
     outputStream match {
       case None      => ZIO.unit
       case Some(out) => ZIO.attemptBlocking(out.close()).mapError {
-        case e: Throwable => CommandError(e)
+        case e: Throwable => CommandError.Error(e)
       }
     }
 
