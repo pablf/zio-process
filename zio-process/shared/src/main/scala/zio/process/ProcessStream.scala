@@ -31,9 +31,10 @@ final case class ProcessStream(
   private def close: ZIO[Any, CommandError, Unit] =
     outputStream match {
       case None      => ZIO.unit
-      case Some(out) => ZIO.attemptBlocking(out.close()).mapError {
-        case e: Throwable => CommandError.Error(e)
-      }
+      case Some(out) =>
+        ZIO.attemptBlocking(out.close()).mapError { case e: Throwable =>
+          CommandError.Error(e)
+        }
     }
 
   /**
@@ -96,10 +97,12 @@ final case class ProcessStream(
    * Note: Needs Java 9 or greater.
    */
   def string(charset: Charset): ZIO[Any, CommandError, String] =
-    ZIO.scoped {close *> ProcessPlatformSpecific.wait(inputStream) *> ZIO.attemptBlockingCancelable {
-      new String(inputStream.readAllBytes(), charset)
-    }(ZIO.succeed(inputStream.close()))}.refineOrDie { case CommandThrowable.IOError(e) =>
+    ZIO.scoped {
+      close *> ProcessPlatformSpecific.wait(inputStream) *> ZIO.attemptBlockingCancelable {
+        new String(inputStream.readAllBytes(), charset)
+      }(ZIO.succeed(inputStream.close()))
+    }.refineOrDie { case CommandThrowable.IOError(e) =>
       e
     }
-    
+
 }
