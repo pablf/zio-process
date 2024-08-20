@@ -184,6 +184,6 @@ object CommandSpec extends ZIOProcessBaseSpec with SpecProperties {
         pid     <- process.pid
       } yield assertTrue(pid > 0L)
     }
-  ) @@ TestAspect.nonFlaky(50)
+  )
 
 }
