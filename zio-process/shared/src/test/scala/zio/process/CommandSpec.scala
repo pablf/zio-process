@@ -163,7 +163,7 @@ object CommandSpec extends ZIOProcessBaseSpec with SpecProperties {
         lines        <- stdout.linesStream.take(3).runCollect
         _            <- process.kill
       } yield assertTrue(lines == Chunk("line1", "line2", "line3"))
-    },
+    } @@ TestAspect.exceptJS,
     test("interactive processes") {
       for {
         commandQueue <- Queue.unbounded[Chunk[Byte]]
