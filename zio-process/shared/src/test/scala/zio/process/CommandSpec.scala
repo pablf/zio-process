@@ -33,7 +33,7 @@ object CommandSpec extends ZIOProcessBaseSpec with SpecProperties {
       val zio = Command("some-invalid-command", "test").string
 
       assertZIO(zio.exit)(fails(isSubtype[CommandError.ProgramNotFound](anything)))
-    } @@ TestAspect.exceptNative,
+    },
     test("pass environment variables") {
       val zio = Command("bash", "-c", "echo -n \"var = $VAR\"").env(Map("VAR" -> "value")).string
 
@@ -44,7 +44,7 @@ object CommandSpec extends ZIOProcessBaseSpec with SpecProperties {
       val zio    = Command("cat").stdin(ProcessInput.fromStream(stream, flushChunksEagerly = false)).string
 
       assertZIO(zio)(equalTo("a b c"))
-    } @@ TestAspect.jvmOnly,
+    },
     test("accept string stdin") { //
       val zio = Command("cat").stdin(ProcessInput.fromUTF8String("piped in")).string
 
@@ -119,14 +119,14 @@ object CommandSpec extends ZIOProcessBaseSpec with SpecProperties {
       val zio = Command(s"${dir}src/test/bash/no-permissions.sh").string
 
       assertZIO(zio.exit)(fails(isSubtype[CommandError.PermissionDenied](anything)))
-    } @@ TestAspect.exceptNative,
+    },
     test("redirectErrorStream should merge stderr into stdout") {
       for {
         process <- Command(s"${dir}src/test/bash/both-streams-test.sh").redirectErrorStream(true).run
         stdout  <- process.stdout.string
         stderr  <- process.stderr.string
       } yield assertTrue(stdout == "stdout1\nstderr1\nstdout2\nstderr2\n", stderr.isEmpty)
-    } @@ TestAspect.exceptJS,
+    },
     test("be able to kill a process that's running") {
       for {
         process           <- Command(s"${dir}src/test/bash/echo-repeat.sh").run
@@ -163,7 +163,7 @@ object CommandSpec extends ZIOProcessBaseSpec with SpecProperties {
         lines        <- stdout.linesStream.take(3).runCollect
         _            <- process.kill
       } yield assertTrue(lines == Chunk("line1", "line2", "line3"))
-    } @@ TestAspect.jvmOnly,
+    },
     test("interactive processes") {
       for {
         commandQueue <- Queue.unbounded[Chunk[Byte]]
@@ -177,7 +177,7 @@ object CommandSpec extends ZIOProcessBaseSpec with SpecProperties {
         _            <- commandQueue.offer(Chunk.fromArray(s"process.exit(0)${sep}".getBytes(StandardCharsets.UTF_8)))
         _            <- fiber.join
       } yield assertCompletes
-    } @@ TestAspect.withLiveClock @@ TestAspect.exceptJS,
+    } @@ TestAspect.withLiveClock,
     test("get pid of a running process") {
       for {
         process <- Command("ls").run
