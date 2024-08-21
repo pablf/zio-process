@@ -2,7 +2,7 @@ package zio.process
 
 import zio.stream.ZPipeline
 import zio.test._
-import zio.Chunk
+import zio.{ durationInt, Chunk }
 
 import FilePlatformSpecific._
 import java.util.Optional
